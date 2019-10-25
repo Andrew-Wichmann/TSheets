@@ -1,4 +1,4 @@
 .vscode
 creds
 *.pyc
-db.sqlite3
+TSheetsAutomation/db.sqlite3
