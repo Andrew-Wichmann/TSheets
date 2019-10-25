@@ -1,0 +1,4 @@
+.vscode
+creds
+*.pyc
+db.sqlite3
