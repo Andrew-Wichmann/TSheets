@@ -2,16 +2,13 @@ from datetime import datetime
 import requests
 
 from django.core.management.base import BaseCommand
+from django.db.models.fields.related import ForeignKey
 from Timesheets.models import (
     LoadTimesheets,
     ManualTimesheet,
     RegularTimesheet,
     User,
     JobCode,
-    DISCARDED_REGULARTIMESHEET_FIELDS,
-    DISCARDED_MANUALTIMESHEET_FIELDS,
-    DISCARDED_JOBCODE_FIELDS,
-    DISCARDED_USER_FIELDS,
 )
 
 
@@ -39,44 +36,56 @@ class Command(BaseCommand):
                 "GET", url, headers=headers, params=querystring
             ).json()
 
-            def create_model_objects(model, fields, discarded_fields):
-                for field in discarded_fields:
-                    fields.pop(field)
-                id_field_to_model = {
-                    "jobcode_id": JobCode,
-                    "user_id": User,
-                    "created_by_user_id": User,
-                }
-                foreign_fields = dict(
-                    filter(lambda elem: elem[0].endswith("_id"), fields.items())
-                )
-                for foreign_key_field, foreign_key_id in foreign_fields.items():
-                    fields.pop(foreign_key_field)
-                    if foreign_key_id:
-                        foreign_model = id_field_to_model[foreign_key_field]
-                        fields[
-                            foreign_key_field.split("_id")[0]
-                        ] = foreign_model.objects.get(id=foreign_key_id)
+            def create_model_objects(model, fields):
+                def filter_unused_fields(model, fields):
+                    captured_fields = []
+                    for field in model._meta.get_fields():
+                        if type(field) == ForeignKey:
+                            captured_fields.append(field.name + "_id")
+                        else:
+                            captured_fields.append(field.name)
+                    for discard in [
+                        field for field in fields if field not in captured_fields
+                    ]:
+                        fields.pop(discard)
+                    return fields
+
+                def map_ids_to_models(model, fields):
+                    id_field_to_model = {
+                        "jobcode_id": JobCode,
+                        "user_id": User,
+                        "created_by_user_id": User,
+                    }
+                    foreign_fields = dict(
+                        filter(lambda elem: elem[0].endswith("_id"), fields.items())
+                    )
+                    for foreign_key_field, foreign_key_id in foreign_fields.items():
+                        fields.pop(foreign_key_field)
+                        if foreign_key_id:
+                            foreign_model = id_field_to_model[foreign_key_field]
+                            fields[
+                                foreign_key_field.split("_id")[0]
+                            ] = foreign_model.objects.get(id=foreign_key_id)
+                    return fields
+
+                fields = filter_unused_fields(model, fields)
+                fields = map_ids_to_models(model, fields)
 
                 id = fields.pop("id")
                 model.objects.update_or_create(id=id, defaults=fields)
 
             for user in response["supplemental_data"].get("users", {}).values():
-                create_model_objects(User, user, DISCARDED_USER_FIELDS)
+                create_model_objects(User, user)
 
             for jobcode in response["supplemental_data"].get("jobcodes", {}).values():
-                create_model_objects(JobCode, jobcode, DISCARDED_JOBCODE_FIELDS)
+                create_model_objects(JobCode, jobcode)
 
             for timesheet in response["results"]["timesheets"].values():
-                type = timesheet.pop("type")
-                if type == "regular":
-                    create_model_objects(
-                        RegularTimesheet, timesheet, DISCARDED_REGULARTIMESHEET_FIELDS
-                    )
-                elif type == "manual":
-                    create_model_objects(
-                        ManualTimesheet, timesheet, DISCARDED_MANUALTIMESHEET_FIELDS
-                    )
+                _type = timesheet.pop("type")
+                if _type == "regular":
+                    create_model_objects(RegularTimesheet, timesheet)
+                elif _type == "manual":
+                    create_model_objects(ManualTimesheet, timesheet)
             # more = bool(response["more"])
             more = False
 

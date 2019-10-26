@@ -1,39 +1,6 @@
 from django.db import models
 
 
-DISCARDED_REGULARTIMESHEET_FIELDS = [
-    "customfields",
-    "attached_files",
-    "created_by_user_id",
-]
-
-DISCARDED_MANUALTIMESHEET_FIELDS = [
-    "customfields",
-    "attached_files",
-    "start",
-    "end",
-    "created_by_user_id",
-]
-
-DISCARDED_USER_FIELDS = [
-    "group_id",
-    "pto_balances",
-    "manager_of_group_ids",
-    "permissions",
-    "customfields",
-    "hire_date",
-    "term_date",
-    "payroll_id",
-]
-
-DISCARDED_JOBCODE_FIELDS = [
-    "parent_id",
-    "required_customfields",
-    "filtered_customfielditems",
-    "locations",
-]
-
-
 class User(models.Model):
     first_name = models.CharField(max_length=256)
     last_name = models.CharField(max_length=256)
@@ -100,6 +67,12 @@ class ManualTimesheet(models.Model):
     notes = models.TextField(max_length=2048)
     last_modified = models.DateTimeField()
 
+    espo_processed = models.BooleanField(default=False)
+
+    @property
+    def hours(self):
+        return self.duration / 360
+
 
 class RegularTimesheet(models.Model):
     user = models.ForeignKey(
@@ -118,6 +91,12 @@ class RegularTimesheet(models.Model):
     start = models.DateTimeField()
     end = models.DateTimeField()
     origin_hint = models.CharField(max_length=256, null=True)
+
+    espo_processed = models.BooleanField(default=False)
+
+    @property
+    def hours(self):
+        return self.duration / 360
 
 
 class LoadTimesheets(models.Model):
