@@ -1,13 +1,15 @@
 from django.contrib import admin
-from django.urls import reverse
-from django.utils.html import mark_safe
-from Timesheets.models import User, ManualTimesheet, RegularTimesheet, JobCode
+from django.urls import reverse, path
+from django.utils.html import mark_safe, format_html
+from django.http.response import JsonResponse
+from django.shortcuts import redirect
+from Timesheets.models import TSheetsUser, ManualTimesheet, RegularTimesheet, JobCode
 
 # Register your models here.
 
 
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+@admin.register(TSheetsUser)
+class TSheetsUserAdmin(admin.ModelAdmin):
     list_display = ["first_name", "last_name", "timesheet_display"]
 
     def timesheet_display(self, obj):
@@ -33,24 +35,18 @@ class UserAdmin(admin.ModelAdmin):
     timesheet_display.short_description = "Timesheets"
 
 
-@admin.register(ManualTimesheet)
-class ManualTimesheetAdmin(admin.ModelAdmin):
-    list_filter = ("espo_processed",)
-    list_display = ("processed_display",)
-
-    def processed_display(self, obj):
-        return obj.espo_processed
-
-    processed_display.short_description = "Espo Processed"
-
-
-@admin.register(RegularTimesheet)
-class RegularTimesheetAdmin(admin.ModelAdmin):
+class TimesheetAdmin(admin.ModelAdmin):
     list_filter = ("espo_processed", "user__last_name")
-    list_display = ("id", "processed_display", "user_display")
+    list_display = (
+        "id",
+        "user_display",
+        "hours_display",
+        "espo_processed",
+        "timesheet_actions",
+    )
 
-    def processed_display(self, obj):
-        return "Yes" if obj.espo_processed else "No"
+    def hours_display(self, obj):
+        return round(obj.hours, 2)
 
     def user_display(self, obj):
         return mark_safe(
@@ -64,8 +60,46 @@ class RegularTimesheetAdmin(admin.ModelAdmin):
             )
         )
 
-    processed_display.short_description = "Espo Processed"
-    user_display.short_description = "User"
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                "<int:timesheet_id>/process/",
+                self.admin_site.admin_view(self.process),
+                name="process_timesheet",
+            )
+        ]
+        return custom_urls + urls
+
+    def process(self, request, timesheet_id):
+        timesheet = self.get_object(request, timesheet_id)
+        if timesheet.process():
+            return redirect(request.META["HTTP_REFERER"])
+        else:
+            JsonResponse(
+                {"timesheet_id": timesheet.id, "message": "Error processing timesheet"}
+            )
+
+    def timesheet_actions(self, obj):
+        if obj.espo_processed:
+            return "None"
+        else:
+            return mark_safe(
+                f'<a class="button" href="{reverse("admin:process_timesheet", args=[obj.pk])}"/>Process<a>'
+            )
+
+    user_display.short_description = "TSheetsUser"
+    hours_display.short_description = "Hours"
+
+
+@admin.register(ManualTimesheet)
+class ManualTimesheetAdmin(TimesheetAdmin):
+    pass
+
+
+@admin.register(RegularTimesheet)
+class RegularTimesheetAdmin(TimesheetAdmin):
+    pass
 
 
 @admin.register(JobCode)

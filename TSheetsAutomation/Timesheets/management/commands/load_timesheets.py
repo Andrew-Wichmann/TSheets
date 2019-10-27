@@ -7,7 +7,7 @@ from Timesheets.models import (
     LoadTimesheets,
     ManualTimesheet,
     RegularTimesheet,
-    User,
+    TSheetsUser,
     JobCode,
 )
 
@@ -53,8 +53,8 @@ class Command(BaseCommand):
                 def map_ids_to_models(model, fields):
                     id_field_to_model = {
                         "jobcode_id": JobCode,
-                        "user_id": User,
-                        "created_by_user_id": User,
+                        "user_id": TSheetsUser,
+                        "created_by_user_id": TSheetsUser,
                     }
                     foreign_fields = dict(
                         filter(lambda elem: elem[0].endswith("_id"), fields.items())
@@ -75,7 +75,7 @@ class Command(BaseCommand):
                 model.objects.update_or_create(id=id, defaults=fields)
 
             for user in response["supplemental_data"].get("users", {}).values():
-                create_model_objects(User, user)
+                create_model_objects(TSheetsUser, user)
 
             for jobcode in response["supplemental_data"].get("jobcodes", {}).values():
                 create_model_objects(JobCode, jobcode)

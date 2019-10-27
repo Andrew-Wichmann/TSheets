@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class User(models.Model):
+class TSheetsUser(models.Model):
     first_name = models.CharField(max_length=256)
     last_name = models.CharField(max_length=256)
     active = models.BooleanField()
@@ -54,7 +54,7 @@ class JobCode(models.Model):
 
 class ManualTimesheet(models.Model):
     user = models.ForeignKey(
-        User, related_name="manual_timesheet", on_delete=models.PROTECT
+        TSheetsUser, related_name="manual_timesheet", on_delete=models.PROTECT
     )
     jobcode = models.ForeignKey(JobCode, null=True, on_delete=models.PROTECT)
     date = models.DateField()
@@ -73,10 +73,15 @@ class ManualTimesheet(models.Model):
     def hours(self):
         return self.duration / 360
 
+    def process(self):
+        self.espo_processed = True
+        self.save()
+        return True
+
 
 class RegularTimesheet(models.Model):
     user = models.ForeignKey(
-        User, related_name="regular_timesheet", on_delete=models.PROTECT
+        TSheetsUser, related_name="regular_timesheet", on_delete=models.PROTECT
     )
     jobcode = models.ForeignKey(JobCode, null=True, on_delete=models.PROTECT)
     date = models.DateField()
@@ -97,6 +102,11 @@ class RegularTimesheet(models.Model):
     @property
     def hours(self):
         return self.duration / 360
+
+    def process(self):
+        self.espo_processed = True
+        self.save()
+        return True
 
 
 class LoadTimesheets(models.Model):
