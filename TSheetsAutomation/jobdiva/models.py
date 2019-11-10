@@ -23,8 +23,7 @@ class Candidate(models.Model):
 class Job(models.Model):
     ID = models.CharField(primary_key=True, max_length=64)
     JOBDIVANO = models.CharField(max_length=64)
-    employee = models.ForeignKey(Candidate, on_delete=models.PROTECT)
-    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    COMPANY = models.ForeignKey(Company, on_delete=models.PROTECT)
 
 
 class Submittal(models.Model):

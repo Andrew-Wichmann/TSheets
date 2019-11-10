@@ -14,6 +14,8 @@ last_sunday_string = (datetime.now() + one_sunday_ago).strftime(DATETIME_STRING_
 two_mondays_ago = relativedelta.relativedelta(weekday=relativedelta.MO(-6))
 two_mondays_ago_string = (datetime.now() - two_mondays_ago).strftime(DATETIME_STRING_FMT)
 
+RETRY_ATTEMPTS = 2
+
 
 class BaseJobDivaClient:
     def __init__(self, service):
@@ -44,15 +46,17 @@ class BaseJobDivaClient:
                     **kwargs,
                 }
 
-            try:
-                return api(**_kwargs)
-            except Exception as e:
-                if "There are too many API requests in the queue." in str(e):
-                    self.logger.warning("Too many api requests. Sleeping for 4 minutes.")
-                    sleep(60 * 4)
-                    return api(**_kwargs)
+            ret = api(**_kwargs)
+            for _ in range(0, RETRY_ATTEMPTS):
+                if not ret.Data:
+                    if "There are too many API requests in the queue." in ret.Message:
+                        self.logger.warning("Too many api requests. Sleeping for 4 minutes.")
+                        sleep(60 * 4)
+                        ret = api(**_kwargs)
+                    else:
+                        raise Exception(ret.Message)
                 else:
-                    raise
+                    return ret
 
         return add_creds
 

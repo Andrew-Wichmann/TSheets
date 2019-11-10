@@ -12,7 +12,7 @@ class Command(BaseCommand):
         logger.setLevel(logging.INFO)
 
         logger.log(logging.INFO, "Loading TSheets timesheets and supplementary data")
-        management.call_command("load_tsheets_models")
+        # management.call_command("load_tsheets_models")
         logger.log(logging.INFO, "Loading Jobdiva hires and supplementary data")
         # management.call_command("load_jobdiva_models")
 

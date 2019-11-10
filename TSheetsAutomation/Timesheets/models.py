@@ -64,7 +64,7 @@ class TimesheetEntry(models.Model):
     user = models.ForeignKey(TSheetsUser, on_delete=models.PROTECT)
 
     def process(self, logger):
-        from jobdiva.models import Hire
+        from jobdiva.models import Hire, Candidate
 
         timesheet_entries = []
         for date in [(self.weekendingdate - relativedelta(days=day)).date() for day in range(0, 7)]:
@@ -73,7 +73,13 @@ class TimesheetEntry(models.Model):
 
             timesheet_entries.append({"date": f"{date}T00:00:00", "hours": duration / 360})
 
-        hire = Hire.objects.filter(CANDIDATE=self.timesheets[0].user.candidate).last()
+        try:
+            candidate = self.timesheets[0].user.candidate
+        except Candidate.DoesNotExist:
+            logger.error("Do not have a Jobdiva user for this timesheet")
+            return
+
+        hire = Hire.objects.filter(CANDIDATE=candidate).last()
         if not hire:
             logger.error("Do not have a Hire object for this user")
         else:
@@ -81,7 +87,7 @@ class TimesheetEntry(models.Model):
 
             payload = {
                 "employeeid": self.user.candidate.ID,
-                "jobid": hire.JOB.ID,
+                "jobid": hire.JOB.JOBDIVANO,
                 "weekendingdate": last_sunday_string,
                 "approved": True,
                 "TimesheetEntry": timesheet_entries,

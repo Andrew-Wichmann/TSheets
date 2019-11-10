@@ -3,6 +3,7 @@ from datetime import date, datetime
 from dateutil import relativedelta
 
 from django.core.management.base import BaseCommand
+from django.db.utils import IntegrityError
 from Timesheets.models import TSheetsUser
 from jobdiva.models import Candidate, Job, Company, Hire
 from jobdiva.client import BIDataClient
@@ -35,10 +36,16 @@ class Command(BaseCommand):
                 create_model_from_dict(
                     Candidate, {**candidate, "tsheets_user": tsheets_user}, id="ID"
                 )
-                job = biclient.get("Job Detail", parameters=hire["JOBID"])[0]
-                create_model_from_dict(Job, job, id="ID")
-
                 company = biclient.get("Company Detail", parameters=hire["COMPANYID"])[0]
                 create_model_from_dict(Company, company, id="ID")
+
+                try:
+                    job = biclient.get("Job Detail", parameters=hire["JOBID"])[0]
+                    create_model_from_dict(Job, job, id="ID")
+                except IntegrityError as e:
+                    import pdb
+
+                    pdb.set_trace()
+                    str(e)
                 create_model_from_dict(Hire, hire, id="ACTIVITYID")
             time.sleep(2)
