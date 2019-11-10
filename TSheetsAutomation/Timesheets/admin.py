@@ -3,9 +3,20 @@ from django.urls import reverse, path
 from django.utils.html import mark_safe, format_html
 from django.http.response import JsonResponse
 from django.shortcuts import redirect
-from Timesheets.models import TSheetsUser, ManualTimesheet, RegularTimesheet, JobCode
+from Timesheets.models import (
+    TSheetsUser,
+    ManualTimesheet,
+    RegularTimesheet,
+    JobCode,
+    TSheetsCompany,
+)
 
 # Register your models here.
+
+
+@admin.register(TSheetsCompany)
+class TSheetsCompanyAdmin(admin.ModelAdmin):
+    list_display = ["id", "name"]
 
 
 @admin.register(TSheetsUser)
@@ -37,13 +48,7 @@ class TSheetsUserAdmin(admin.ModelAdmin):
 
 class TimesheetAdmin(admin.ModelAdmin):
     list_filter = ("espo_processed", "user__last_name")
-    list_display = (
-        "id",
-        "user_display",
-        "hours_display",
-        "espo_processed",
-        "timesheet_actions",
-    )
+    list_display = ("id", "user_display", "hours_display", "espo_processed", "timesheet_actions")
 
     def hours_display(self, obj):
         return round(obj.hours, 2)
@@ -76,9 +81,7 @@ class TimesheetAdmin(admin.ModelAdmin):
         if timesheet.process():
             return redirect(request.META["HTTP_REFERER"])
         else:
-            JsonResponse(
-                {"timesheet_id": timesheet.id, "message": "Error processing timesheet"}
-            )
+            JsonResponse({"timesheet_id": timesheet.id, "message": "Error processing timesheet"})
 
     def timesheet_actions(self, obj):
         if obj.espo_processed:

@@ -2,3 +2,4 @@
 creds
 *.pyc
 *.sqlite3
+logs/

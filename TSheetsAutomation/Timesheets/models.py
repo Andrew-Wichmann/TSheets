@@ -1,4 +1,13 @@
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 from django.db import models
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+from jobdiva.client import JobDivaAPIClient, last_sunday_string
+
+
+class TSheetsCompany(models.Model):
+    name = models.CharField(max_length=256)
 
 
 class TSheetsUser(models.Model):
@@ -22,9 +31,7 @@ class TSheetsUser(models.Model):
     approved_to = models.DateField()
     require_password_change = models.BooleanField()
     pay_rate = models.FloatField()
-    pay_interval = models.CharField(
-        max_length=256, choices=[("hour", "hour"), ("year", "year")]
-    )
+    pay_interval = models.CharField(max_length=256, choices=[("hour", "hour"), ("year", "year")])
 
 
 class JobCode(models.Model):
@@ -52,10 +59,53 @@ class JobCode(models.Model):
     # 	unique_together = [("parent_id", "name"), ("parent_id", "short_code")]
 
 
+class TimesheetEntry(models.Model):
+    weekendingdate = models.DateTimeField()
+    user = models.ForeignKey(TSheetsUser, on_delete=models.PROTECT)
+
+    def process(self, logger):
+        from jobdiva.models import Hire
+
+        timesheet_entries = []
+        for date in [(self.weekendingdate - relativedelta(days=day)).date() for day in range(0, 7)]:
+            timesheets = list(filter(lambda timesheet: timesheet.date == date, self.timesheets))
+            duration = sum([timesheet.duration for timesheet in timesheets])
+
+            timesheet_entries.append({"date": f"{date}T00:00:00", "hours": duration / 360})
+
+        hire = Hire.objects.filter(CANDIDATE=self.timesheets[0].user.candidate).last()
+        if not hire:
+            logger.error("Do not have a Hire object for this user")
+        else:
+            api_client = JobDivaAPIClient()
+
+            payload = {
+                "employeeid": self.user.candidate.ID,
+                "jobid": hire.JOB.ID,
+                "weekendingdate": last_sunday_string,
+                "approved": True,
+                "TimesheetEntry": timesheet_entries,
+            }
+            logger.info(f"mock upload timesheet {payload}")
+            # api_client.uploadTimesheet(**payload)
+            for timesheet in self.timesheets:
+                timesheet.espo_processed = True
+                timesheet.save()
+
+    @property
+    def timesheets(self):
+        return list(self.manualtimesheet_set.all()) + list(self.regulartimesheet_set.all())
+
+    @property
+    def processed(self):
+        if all([timesheet.espo_processed for timesheet in self.timesheets]):
+            return True
+        else:
+            return False
+
+
 class ManualTimesheet(models.Model):
-    user = models.ForeignKey(
-        TSheetsUser, related_name="manual_timesheet", on_delete=models.PROTECT
-    )
+    user = models.ForeignKey(TSheetsUser, related_name="manual_timesheet", on_delete=models.PROTECT)
     jobcode = models.ForeignKey(JobCode, null=True, on_delete=models.PROTECT)
     date = models.DateField()
     duration = models.IntegerField()
@@ -68,6 +118,7 @@ class ManualTimesheet(models.Model):
     last_modified = models.DateTimeField()
 
     espo_processed = models.BooleanField(default=False)
+    timesheet_entry = models.ForeignKey(TimesheetEntry, on_delete=models.PROTECT, null=True)
 
     @property
     def hours(self):
@@ -98,14 +149,26 @@ class RegularTimesheet(models.Model):
     origin_hint = models.CharField(max_length=256, null=True)
 
     espo_processed = models.BooleanField(default=False)
+    timesheet_entry = models.ForeignKey(TimesheetEntry, on_delete=models.PROTECT, null=True)
 
     @property
     def hours(self):
         return self.duration / 360
 
     def process(self):
-        self.espo_processed = True
-        self.save()
+        # employeeid = 10947061895756
+        # jobid = 19-00886
+        timesheetentries = [
+            {"date": f"{self.date.isoformat()}T00:00:00", "hours": self.duration}
+            for _ in range(0, 7)
+        ]
+        # {"date": "2019-11-04T00:00:00", "hours": 30}, {"date": "2019-11-05T00:00:00", "hours": 30}, {"date": "2019-11-06T00:00:00", "hours": 30} ,{"date": "2019-11-07T00:00:00", "hours": 30}, {"date": "2019-11-08T00:00:00", "hours": 30}, {"date": "2019-11-09T00:00:00", "hours": 30}, {"date": "2019-11-10T00:00:00", "hours": 30}]
+        # weekendingdate="2019-11-10T00:00:00"
+
+        # self.espo_processed = True
+        # bidata_client = BIDataClient()
+        # bidata_client.getBIData(MetricName="Candidate Detail", parameters=None)
+        # self.save()
         return True
 
 
