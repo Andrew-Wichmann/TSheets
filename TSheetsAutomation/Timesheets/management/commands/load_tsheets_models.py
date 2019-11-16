@@ -20,7 +20,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         url = "https://rest.tsheets.com/api/v1/timesheets"
 
-        import pdb;pdb.set_trace()
         last_run = LoadTimesheets.objects.order_by("run_at").last().run_at
         querystring = {
             "start_date": last_run.strftime("%Y-%m-%d"),
