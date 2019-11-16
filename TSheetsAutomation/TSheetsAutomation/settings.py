@@ -133,7 +133,7 @@ LOGGING = {
             "filename": os.path.join(BASE_DIR, "logs", "management.log"),
         },
         "jobdiva": {
-            "level": "DEBUG",
+            "level": "INFO",
             "class": "logging.FileHandler",
             "formatter": "verbose",
             "filename": os.path.join(BASE_DIR, "logs", "jobdiva.log"),
@@ -142,11 +142,7 @@ LOGGING = {
     "loggers": {
         "django": {"handlers": ["django"], "level": "INFO", "propagate": True},
         "management": {"handlers": ["management"], "level": "INFO", "propagate": True},
-        "JobDivaClient - BIData": {"handlers": ["jobdiva"], "level": "DEBUG", "propagate": True},
-        "JobDivaClient - JobdivaAPI": {
-            "handlers": ["jobdiva"],
-            "level": "DEBUG",
-            "propagate": True,
-        },
+        "JobDivaClient - BIData": {"handlers": ["jobdiva"], "level": "INFO", "propagate": True},
+        "JobDivaClient - JobdivaAPI": {"handlers": ["jobdiva"], "level": "INFO", "propagate": True},
     },
 }
