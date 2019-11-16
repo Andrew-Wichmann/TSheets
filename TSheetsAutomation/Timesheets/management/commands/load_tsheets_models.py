@@ -26,15 +26,20 @@ class Command(BaseCommand):
             "start_date": "2019-10-21",
             "end_date": datetime.now().strftime("%Y-%m-%d"),
             "on_the_clock": "no",
+            "per_page": 50,
+            "page": 1,
         }
 
         def get_token():
             with open(os.path.join(settings.CREDENTIALS_FOLDER, "tsheets_token"), "r") as fd:
-                return fd.readline().split('\n')[0]
+                return fd.readline().split("\n")[0]
 
         headers = {"Authorization": f"Bearer {get_token()}"}
 
         more = True
+        import pdb
+
+        pdb.set_trace()
         while more:
             response = requests.request("GET", url, headers=headers, params=querystring).json()
 
@@ -59,7 +64,7 @@ class Command(BaseCommand):
                 )
                 model_obj.timesheet_entry = timesheet_entry
                 model_obj.save()
-            # more = bool(response["more"])
-            more = False
+            more = bool(response["more"])
+            querystring.update({"page": querystring["page"] + 1})
 
         LoadTimesheets().save()
