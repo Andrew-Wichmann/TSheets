@@ -2,6 +2,7 @@ import os
 import requests
 from datetime import datetime
 from dateutil import relativedelta
+from time import sleep
 
 from django.core.management.base import BaseCommand
 from Timesheets.models import (
@@ -38,7 +39,11 @@ class Command(BaseCommand):
         more = True
         while more:
             response = requests.request("GET", url, headers=headers, params=querystring).json()
-
+            if response.status_code != 200:
+                if response.status_code == 429:  # Too Many Requests
+                    sleep(5 * 60)  # Sleep for 5 minutes
+                else:
+                    response.raise_for_status()
             for user in response["supplemental_data"].get("users", {}).values():
                 create_model_from_dict(TSheetsUser, user)
 
