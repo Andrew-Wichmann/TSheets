@@ -30,7 +30,7 @@ class Command(BaseCommand):
 
         def get_token():
             with open(os.path.join(settings.CREDENTIALS_FOLDER, "tsheets_token"), "r") as fd:
-                return fd.readline()
+                return fd.readline().split('\n')[0]
 
         headers = {"Authorization": f"Bearer {get_token()}"}
 
