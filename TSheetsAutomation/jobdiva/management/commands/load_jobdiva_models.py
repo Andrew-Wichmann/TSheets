@@ -1,3 +1,4 @@
+import logging
 import time
 from datetime import date, datetime
 from dateutil import relativedelta
@@ -21,7 +22,7 @@ class Command(BaseCommand):
         sunday = (datetime.now() + sunday_ago).strftime(DATETIME_STRING_FMT)
         mondays_ago = relativedelta.relativedelta(weekday=relativedelta.MO(-(options["weeks_ago"])))
         monday = (datetime.now() - mondays_ago).strftime(DATETIME_STRING_FMT)
-        biclient = BIDataClient()
+        biclient = BIDataClient(loglevel=logging.DEBUG)
         activities = biclient.get(
             "Submittal/Interview/Hire Activities List", from_string=monday, to_string=sunday
         )
@@ -36,16 +37,11 @@ class Command(BaseCommand):
                 create_model_from_dict(
                     Candidate, {**candidate, "tsheets_user": tsheets_user}, id="ID"
                 )
+
                 company = biclient.get("Company Detail", parameters=hire["COMPANYID"])[0]
                 create_model_from_dict(Company, company, id="ID")
 
-                try:
-                    job = biclient.get("Job Detail", parameters=hire["JOBID"])[0]
-                    create_model_from_dict(Job, job, id="ID")
-                except IntegrityError as e:
-                    import pdb
-
-                    pdb.set_trace()
-                    str(e)
+                job = biclient.get("Job Detail", parameters=hire["JOBID"])[0]
+                create_model_from_dict(Job, job, id="ID")
                 create_model_from_dict(Hire, hire, id="ACTIVITYID")
             time.sleep(2)
