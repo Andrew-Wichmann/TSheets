@@ -52,7 +52,7 @@ def create_model_from_dict(model, fields, id="id"):
     _id = fields.pop(id)
 
     logging.getLogger("model_creator").info(
-        f"Creating a {model._meta.name} model with fields: {fields}"
+        f"Creating a {model._meta.object_name} model with fields: {fields}"
     )
     obj, _ = model.objects.update_or_create(defaults=fields, **{id: _id})
     return obj
