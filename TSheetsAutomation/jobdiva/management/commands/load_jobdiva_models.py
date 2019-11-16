@@ -23,7 +23,7 @@ class Command(BaseCommand):
         sunday = (datetime.now() + sunday_ago).strftime(DATETIME_STRING_FMT)
         mondays_ago = relativedelta.relativedelta(weekday=relativedelta.MO(-(options["weeks_ago"])))
         monday = (datetime.now() - mondays_ago).strftime(DATETIME_STRING_FMT)
-        biclient = BIDataClient(loglevel=logging.DEBUG)
+        biclient = BIDataClient()
         activities = biclient.get(
             "Submittal/Interview/Hire Activities List", from_string=monday, to_string=sunday
         )
