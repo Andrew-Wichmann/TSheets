@@ -9,11 +9,10 @@ from Timesheets.models import TimesheetEntry
 class Command(BaseCommand):
     def handle(self, *args, **options):
         logger = logging.getLogger("management")
-        logger.setLevel(logging.INFO)
 
-        logger.log(logging.INFO, "Loading TSheets timesheets and supplementary data")
+        logger.info("Loading TSheets timesheets and supplementary data")
         management.call_command("load_tsheets_models")
-        logger.log(logging.INFO, "Loading Jobdiva hires and supplementary data")
+        logger.info("Loading Jobdiva hires and supplementary data")
         management.call_command("load_jobdiva_models")
 
         for timesheet_entry in filter(
