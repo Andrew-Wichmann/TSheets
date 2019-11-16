@@ -38,12 +38,13 @@ class Command(BaseCommand):
 
         more = True
         while more:
-            response = requests.request("GET", url, headers=headers, params=querystring).json()
+            response = requests.request("GET", url, headers=headers, params=querystring)
             if response.status_code != 200:
                 if response.status_code == 429:  # Too Many Requests
                     sleep(5 * 60)  # Sleep for 5 minutes
                 else:
                     response.raise_for_status()
+            response = response.json()
             for user in response["supplemental_data"].get("users", {}).values():
                 create_model_from_dict(TSheetsUser, user)
 
