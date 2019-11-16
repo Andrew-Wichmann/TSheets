@@ -21,7 +21,9 @@ class Command(BaseCommand):
         logger = logging.getLogger("management")
         sunday_ago = relativedelta.relativedelta(weekday=relativedelta.SU(-options["weeks_ago"]))
         sunday = (datetime.now() + sunday_ago).strftime(DATETIME_STRING_FMT)
-        mondays_ago = relativedelta.relativedelta(weekday=relativedelta.MO(-(options["weeks_ago"])))
+        mondays_ago = relativedelta.relativedelta(
+            weekday=relativedelta.MO(-(options["weeks_ago"] + 1))
+        )
         monday = (datetime.now() - mondays_ago).strftime(DATETIME_STRING_FMT)
         biclient = BIDataClient()
         activities = biclient.get(
