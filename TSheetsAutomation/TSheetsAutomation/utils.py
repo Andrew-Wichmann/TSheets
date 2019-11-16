@@ -1,3 +1,5 @@
+import logging
+
 from django.db.models.fields.related import ForeignKey
 from Timesheets.models import TSheetsUser, JobCode
 from jobdiva.models import Job, Company, Candidate
@@ -32,8 +34,7 @@ def create_model_from_dict(model, fields, id="id"):
         }
         foreign_fields = dict(
             filter(
-                lambda elem: elem[0] not in (id_postfix, id)
-                and elem[0].endswith(id_postfix),
+                lambda elem: elem[0] not in (id_postfix, id) and elem[0].endswith(id_postfix),
                 fields.items(),
             )
         )
@@ -49,5 +50,9 @@ def create_model_from_dict(model, fields, id="id"):
     fields = filter_unused_fields(model, fields)
     fields = map_ids_to_models(model, fields, id)
     _id = fields.pop(id)
+
+    logging.get_logger("model_creator").info(
+        f"Creating a {model._meta.name} model with fields: {fields}"
+    )
     obj, _ = model.objects.update_or_create(defaults=fields, **{id: _id})
     return obj

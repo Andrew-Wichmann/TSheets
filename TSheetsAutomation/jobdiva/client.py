@@ -56,7 +56,9 @@ class BaseJobDivaClient:
                     else:
                         raise Exception(ret.Message)
                 else:
-                    self.logger.debug(f"Received the follow from {service} for {_kwargs}\n{ret}")
+                    self.logger.debug(
+                        f"Received the following data from {service} for {_kwargs}\n{ret}"
+                    )
                     return ret
 
         return add_creds

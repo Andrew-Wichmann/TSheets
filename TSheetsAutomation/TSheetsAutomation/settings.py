@@ -25,7 +25,7 @@ SECRET_KEY = "-**+3y$y0245-(z1jqfbo9iqxe4=vor!$1ao%bc2kepw(0@qf)"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["192.168.168.253"]
 
 
 # Application definition
@@ -122,21 +122,35 @@ LOGGING = {
     "handlers": {
         "django": {
             "level": "INFO",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
+            "maxBytes": 1024 * 1024 * 10,
+            "backupCount": 10,
             "formatter": "verbose",
             "filename": os.path.join(BASE_DIR, "logs", "django.log"),
         },
         "management": {
             "level": "INFO",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
+            "maxBytes": 1024 * 1024 * 10,
+            "backupCount": 10,
             "formatter": "verbose",
             "filename": os.path.join(BASE_DIR, "logs", "management.log"),
         },
         "jobdiva": {
             "level": "INFO",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
+            "maxBytes": 1024 * 1024 * 10,
+            "backupCount": 10,
             "formatter": "verbose",
             "filename": os.path.join(BASE_DIR, "logs", "jobdiva.log"),
+        },
+        "model_creator": {
+            "level": "INFO",
+            "class": "logging.handlers.RotatingFileHandler",
+            "maxBytes": 1024 * 1024 * 10,
+            "backupCount": 10,
+            "formatter": "verbose",
+            "filename": os.path.join(BASE_DIR, "logs", "model_creator.log"),
         },
     },
     "loggers": {
@@ -144,5 +158,6 @@ LOGGING = {
         "management": {"handlers": ["management"], "level": "INFO", "propagate": True},
         "JobDivaClient - BIData": {"handlers": ["jobdiva"], "level": "INFO", "propagate": True},
         "JobDivaClient - JobdivaAPI": {"handlers": ["jobdiva"], "level": "INFO", "propagate": True},
+        "model_creator": {"handlers": ["model_creator"], "level": "INFO", "propagate": True},
     },
 }
