@@ -18,6 +18,7 @@ class Command(BaseCommand):
         parser.add_argument("--weeks_ago", type=int, default=1)
 
     def handle(self, *args, **options):
+        logger = logging.getLogger("management")
         sunday_ago = relativedelta.relativedelta(weekday=relativedelta.SU(-options["weeks_ago"]))
         sunday = (datetime.now() + sunday_ago).strftime(DATETIME_STRING_FMT)
         mondays_ago = relativedelta.relativedelta(weekday=relativedelta.MO(-(options["weeks_ago"])))
@@ -30,10 +31,12 @@ class Command(BaseCommand):
         for activity in activities:
             if activity["HIREFLAG"] == "1":
                 hires.append(activity)
+        logger.log(logging.INFO, f"Found {len(hires)} hire activities from {monday} to {sunday}.")
         for hire in hires:
             candidate = biclient.get("Candidate Detail", parameters=hire["CANDIDATEID"])[0]
             tsheets_user = TSheetsUser.objects.filter(email=candidate["EMAIL"]).first()
             if tsheets_user:
+                logger.log(logging.INFO, "Found a tsheets user in jobdiva.")
                 create_model_from_dict(
                     Candidate, {**candidate, "tsheets_user": tsheets_user}, id="ID"
                 )
