@@ -50,15 +50,13 @@ class BaseJobDivaClient:
             for _ in range(0, RETRY_ATTEMPTS):
                 if not ret.Data:
                     if "There are too many API requests in the queue." in ret.Message:
-                        self.logger.log(
-                            logging.warning, "Too many api requests. Sleeping for 4 minutes."
-                        )
+                        self.logger.warning("Too many api requests. Sleeping for 4 minutes.")
                         sleep(60 * 4)
                         ret = api(**_kwargs)
                     else:
                         raise Exception(ret.Message)
                 else:
-                    self.logger.log(logging.DEBUG, f"Received {ret} from {service} for {_kwargs}")
+                    self.logger.debug(f"Received {ret} from {service} for {_kwargs}")
                     return ret
 
         return add_creds

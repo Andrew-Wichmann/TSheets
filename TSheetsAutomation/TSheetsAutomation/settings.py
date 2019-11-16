@@ -133,7 +133,7 @@ LOGGING = {
             "filename": os.path.join(BASE_DIR, "logs", "management.log"),
         },
         "jobdiva": {
-            "level": "INFO",
+            "level": "DEBUG",
             "class": "logging.FileHandler",
             "formatter": "verbose",
             "filename": os.path.join(BASE_DIR, "logs", "jobdiva.log"),
