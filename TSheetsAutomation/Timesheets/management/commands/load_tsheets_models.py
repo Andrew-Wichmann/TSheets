@@ -37,9 +37,6 @@ class Command(BaseCommand):
         headers = {"Authorization": f"Bearer {get_token()}"}
 
         more = True
-        import pdb
-
-        pdb.set_trace()
         while more:
             response = requests.request("GET", url, headers=headers, params=querystring).json()
 
