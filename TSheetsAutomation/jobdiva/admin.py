@@ -24,15 +24,12 @@ class JobAdmin(admin.ModelAdmin):
 @admin.register(Candidate)
 class CandidateAdmin(admin.ModelAdmin):
 
-    list_display = ["ID", "FIRSTNAME", "LASTNAME", "tsheets_user"]
+    list_display = ["ID", "FIRSTNAME", "LASTNAME", "tsheets_user_display"]
 
-    def tsheets_user(self, obj):
+    def tsheets_user_display(self, obj):
         user = obj.sheets_user
-        display_text = "<a href={}>{} hours - {}</a>".format(
-            reverse(
-                f"admin:{user._meta.app_label}_{user._meta.model_name}_change",
-                args=(user.pk,),
-            )
+        display_text = "<a href={}>{}</a>".format(
+            reverse(f"admin:{user._meta.app_label}_{user._meta.model_name}_change", args=(user.pk,))
         )
 
         if display_text:

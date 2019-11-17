@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -63,9 +64,10 @@ class TimesheetEntry(models.Model):
     weekendingdate = models.DateTimeField()
     user = models.ForeignKey(TSheetsUser, on_delete=models.PROTECT)
 
-    def process(self, logger):
+    def process(self):
         from jobdiva.models import Hire, Candidate
 
+        logger = logging.getLogger("management")
         timesheet_entries = []
         for date in [(self.weekendingdate - relativedelta(days=day)).date() for day in range(0, 7)]:
             timesheets = list(filter(lambda timesheet: timesheet.date == date, self.timesheets))
@@ -77,11 +79,12 @@ class TimesheetEntry(models.Model):
             candidate = self.timesheets[0].user.candidate
         except Candidate.DoesNotExist:
             logger.error("Do not have a Jobdiva user for this timesheet")
-            return
+            return False
 
         hire = Hire.objects.filter(CANDIDATE=candidate).last()
         if not hire:
             logger.error("Do not have a Hire object for this user")
+            return False
         else:
             api_client = JobDivaAPIClient()
 
@@ -97,6 +100,7 @@ class TimesheetEntry(models.Model):
             for timesheet in self.timesheets:
                 timesheet.espo_processed = True
                 timesheet.save()
+        return True
 
     @property
     def timesheets(self):

@@ -21,4 +21,4 @@ class Command(BaseCommand):
             logger.info(
                 f"Processing timesheets for {timesheet_entry.user.email} for the weekendingdate of {timesheet_entry.weekendingdate}"
             )
-            timesheet_entry.process(logger)
+            timesheet_entry.process()
