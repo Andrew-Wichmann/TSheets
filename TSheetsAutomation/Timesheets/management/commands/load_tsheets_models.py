@@ -6,7 +6,6 @@ from time import sleep
 
 from django.core.management.base import BaseCommand
 from Timesheets.models import (
-    LoadTimesheets,
     ManualTimesheet,
     RegularTimesheet,
     TSheetsUser,
@@ -18,13 +17,16 @@ from TSheetsAutomation.utils import create_model_from_dict
 
 
 class Command(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument("--start_date", type=str)
+        parser.add_argument("--end_date", type=str)
+
     def handle(self, *args, **options):
         url = "https://rest.tsheets.com/api/v1/timesheets"
 
-        last_run = LoadTimesheets.objects.order_by("run_at").last().run_at
         querystring = {
-            "start_date": last_run.strftime("%Y-%m-%d"),
-            "end_date": datetime.now().strftime("%Y-%m-%d"),
+            "start_date": options["start_date"],
+            "end_date": options["end_date"],
             "on_the_clock": "no",
             "per_page": 50,
             "page": 1,
@@ -68,5 +70,3 @@ class Command(BaseCommand):
                 model_obj.save()
             more = bool(response["more"])
             querystring.update({"page": querystring["page"] + 1})
-
-        LoadTimesheets().save()

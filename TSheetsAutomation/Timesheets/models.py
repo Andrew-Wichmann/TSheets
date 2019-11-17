@@ -175,7 +175,3 @@ class RegularTimesheet(models.Model):
         # bidata_client.getBIData(MetricName="Candidate Detail", parameters=None)
         # self.save()
         return True
-
-
-class LoadTimesheets(models.Model):
-    run_at = models.DateTimeField(auto_now=True)

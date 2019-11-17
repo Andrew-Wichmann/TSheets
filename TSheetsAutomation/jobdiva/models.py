@@ -42,3 +42,7 @@ class Hire(models.Model):
     CANDIDATE = models.ForeignKey(Candidate, on_delete=models.PROTECT)
     COMPANY = models.ForeignKey(Company, on_delete=models.PROTECT)
     ACTIVITYDATE = models.DateTimeField()
+
+
+class ProcessTimesheetsRun(models.Model):
+    run_at = models.DateTimeField(auto_now=True)

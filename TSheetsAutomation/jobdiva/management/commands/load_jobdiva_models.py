@@ -15,25 +15,25 @@ DATETIME_STRING_FMT = "%Y-%m-%d"
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument("--weeks_ago", type=int, default=1)
+        parser.add_argument("--start_date", type=str)
+        parser.add_argument("--end_date", type=str)
 
     def handle(self, *args, **options):
         logger = logging.getLogger("management")
-        sunday_ago = relativedelta.relativedelta(weekday=relativedelta.SU(-options["weeks_ago"]))
-        sunday = (datetime.now() + sunday_ago).strftime(DATETIME_STRING_FMT)
-        mondays_ago = relativedelta.relativedelta(
-            weekday=relativedelta.MO(-(options["weeks_ago"] + 1))
-        )
-        monday = (datetime.now() - mondays_ago).strftime(DATETIME_STRING_FMT)
         biclient = BIDataClient()
         activities = biclient.get(
-            "Submittal/Interview/Hire Activities List", from_string=monday, to_string=sunday
+            "Submittal/Interview/Hire Activities List",
+            from_string=options["start_date"],
+            to_string=options["end_date"],
         )
         hires = []
         for activity in activities:
             if activity["HIREFLAG"] == "1":
                 hires.append(activity)
-        logger.log(logging.INFO, f"Found {len(hires)} hire activities from {monday} to {sunday}.")
+        logger.log(
+            logging.INFO,
+            f"Found {len(hires)} hire activities from {options['start_date']} to {options['end_date']}.",
+        )
         for hire in hires:
             candidate = biclient.get("Candidate Detail", parameters=hire["CANDIDATEID"])[0]
             tsheets_user = TSheetsUser.objects.filter(email=candidate["EMAIL"]).first()
