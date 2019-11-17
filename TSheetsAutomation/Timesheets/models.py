@@ -90,8 +90,8 @@ class TimesheetEntry(models.Model):
                 "approved": True,
                 "TimesheetEntry": timesheet_entries,
             }
-            logger.info(f"mock upload timesheet {payload}")
-            # JobDivaAPIClient().uploadTimesheet(**payload)
+            logger.debug(f"mock upload timesheet {payload}")
+            JobDivaAPIClient().uploadTimesheet(**payload)
             for timesheet in self.timesheets:
                 timesheet.espo_processed = True
                 timesheet.save()
