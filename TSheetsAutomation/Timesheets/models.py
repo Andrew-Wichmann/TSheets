@@ -7,10 +7,6 @@ from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from jobdiva.client import JobDivaAPIClient, last_sunday_string
 
 
-class TSheetsCompany(models.Model):
-    name = models.CharField(max_length=256)
-
-
 class TSheetsUser(models.Model):
     first_name = models.CharField(max_length=256)
     last_name = models.CharField(max_length=256)
@@ -86,7 +82,6 @@ class TimesheetEntry(models.Model):
             logger.error("Do not have a Hire object for this user")
             return False
         else:
-            api_client = JobDivaAPIClient()
 
             payload = {
                 "employeeid": self.user.candidate.ID,
@@ -96,7 +91,7 @@ class TimesheetEntry(models.Model):
                 "TimesheetEntry": timesheet_entries,
             }
             logger.info(f"mock upload timesheet {payload}")
-            # api_client.uploadTimesheet(**payload)
+            # JobDivaAPIClient().uploadTimesheet(**payload)
             for timesheet in self.timesheets:
                 timesheet.espo_processed = True
                 timesheet.save()

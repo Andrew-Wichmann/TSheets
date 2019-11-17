@@ -3,13 +3,7 @@ from django.urls import reverse, path
 from django.utils.html import mark_safe, format_html
 from django.http.response import JsonResponse
 from django.shortcuts import redirect
-from Timesheets.models import (
-    TSheetsUser,
-    ManualTimesheet,
-    RegularTimesheet,
-    TimesheetEntry,
-    TSheetsCompany,
-)
+from Timesheets.models import TSheetsUser, ManualTimesheet, RegularTimesheet, TimesheetEntry
 
 # Register your models here.
 
