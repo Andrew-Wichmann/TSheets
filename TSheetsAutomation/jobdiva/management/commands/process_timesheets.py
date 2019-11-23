@@ -12,7 +12,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         logger = logging.getLogger("management")
 
-        start_date = ProcessTimesheetsRun.objects.order_by("run_at").last().strftime("%Y-%m-%d")
+        start_date = ProcessTimesheetsRun.objects.order_by("run_at").last().run_at.strftime("%Y-%m-%d")
         end_date = datetime.now().strftime("%Y-%m-%d")
 
         logger.info("Loading TSheets timesheets and supplementary data")

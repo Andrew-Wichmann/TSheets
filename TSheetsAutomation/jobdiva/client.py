@@ -48,13 +48,16 @@ class BaseJobDivaClient:
 
             ret = api(**_kwargs)
             for _ in range(0, RETRY_ATTEMPTS):
-                if not ret.Data:
-                    if "There are too many API requests in the queue." in ret.Message:
-                        self.logger.warning("Too many api requests. Sleeping for 4 minutes.")
-                        sleep(60 * 4)
-                        ret = api(**_kwargs)
+                if service == "BIData":
+                    if not ret.Data:
+                        if "There are too many API requests in the queue." in ret.Message:
+                            self.logger.warning("Too many api requests. Sleeping for 4 minutes.")
+                            sleep(60 * 4)
+                            ret = api(**_kwargs)
+                        else:
+                            raise Exception(ret.Message)
                     else:
-                        raise Exception(ret.Message)
+                        return ret
                 else:
                     self.logger.debug(
                         f"Received the following data from {service} for {_kwargs}\n{ret}"

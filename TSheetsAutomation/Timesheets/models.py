@@ -67,9 +67,9 @@ class TimesheetEntry(models.Model):
         timesheet_entries = []
         for date in [(self.weekendingdate - relativedelta(days=day)).date() for day in range(0, 7)]:
             timesheets = list(filter(lambda timesheet: timesheet.date == date, self.timesheets))
-            duration = sum([timesheet.duration for timesheet in timesheets])
+            hours = sum([timesheet.hours for timesheet in timesheets])
 
-            timesheet_entries.append({"date": f"{date}T00:00:00", "hours": duration / 360})
+            timesheet_entries.append({"date": f"{date}T00:00:00", "hours": hours})
 
         try:
             candidate = self.timesheets[0].user.candidate
@@ -85,8 +85,8 @@ class TimesheetEntry(models.Model):
 
             payload = {
                 "employeeid": self.user.candidate.ID,
-                "jobid": hire.JOB.JOBDIVANO,
-                "weekendingdate": last_sunday_string,
+                "jobid": hire.JOB.JOBDIVANO.replace("-", ""),
+                "weekendingdate": self.weekendingdate.isoformat().split("+")[0],
                 "approved": True,
                 "TimesheetEntry": timesheet_entries,
             }
@@ -127,7 +127,7 @@ class ManualTimesheet(models.Model):
 
     @property
     def hours(self):
-        return self.duration / 360
+        return self.duration / 3600
 
     def process(self):
         self.espo_processed = True
@@ -158,7 +158,7 @@ class RegularTimesheet(models.Model):
 
     @property
     def hours(self):
-        return self.duration / 360
+        return self.duration / 3600
 
     def process(self):
         # employeeid = 10947061895756

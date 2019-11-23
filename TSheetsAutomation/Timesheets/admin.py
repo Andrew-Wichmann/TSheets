@@ -117,7 +117,7 @@ class TimesheetEntry(admin.ModelAdmin):
     def process(self, request, timesheet_entry_id):
         timesheet_entry = self.get_object(request, timesheet_entry_id)
         if timesheet_entry.process():
-            return redirect(request.META["HTTP_REFERER"])
+            return redirect("/admin/Timesheets/timesheetentry")
         else:
             JsonResponse(
                 {"timesheet_entry_id": timesheet_entry.id, "message": "Error processing timesheet"}
