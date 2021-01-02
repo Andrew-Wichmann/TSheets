@@ -27,7 +27,7 @@ class CandidateAdmin(admin.ModelAdmin):
     list_display = ["ID", "FIRSTNAME", "LASTNAME", "tsheets_user_display"]
 
     def tsheets_user_display(self, obj):
-        user = obj.sheets_user
+        user = obj.tsheets_user
         display_text = "<a href={}>{}</a>".format(
             reverse(f"admin:{user._meta.app_label}_{user._meta.model_name}_change", args=(user.pk,))
         )
