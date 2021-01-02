@@ -51,5 +51,5 @@ class Command(BaseCommand):
                 create_model_from_dict(Job, job, id="ID")
                 create_model_from_dict(Hire, hire, id="ACTIVITYID")
             else:
-                logger.warning(f"Did not find jobdiva candidate {candidate["EMAIL"]} in our tsheets DB.")
+                logger.warning(f"Did not find jobdiva candidate {candidate['EMAIL']} in our tsheets DB.")
             time.sleep(2)
