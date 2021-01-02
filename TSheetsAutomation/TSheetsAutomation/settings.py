@@ -87,7 +87,9 @@ DATABASES = {
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -118,7 +120,9 @@ CREDENTIALS_FOLDER = os.path.join(BASE_DIR, "creds")
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"verbose": {"format": "{levelname} {asctime} - {message}", "style": "{"}},
+    "formatters": {
+        "verbose": {"format": "{levelname} {asctime} - {message}", "style": "{"}
+    },
     "handlers": {
         "django": {
             "level": "INFO",
@@ -156,8 +160,20 @@ LOGGING = {
     "loggers": {
         "django": {"handlers": ["django"], "level": "INFO", "propagate": True},
         "management": {"handlers": ["management"], "level": "INFO", "propagate": True},
-        "JobDivaClient - BIData": {"handlers": ["jobdiva"], "level": "INFO", "propagate": True},
-        "JobDivaClient - JobdivaAPI": {"handlers": ["jobdiva"], "level": "INFO", "propagate": True},
-        "model_creator": {"handlers": ["model_creator"], "level": "INFO", "propagate": True},
+        "JobDivaClient - BIData": {
+            "handlers": ["jobdiva"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "JobDivaClient - JobdivaAPI": {
+            "handlers": ["jobdiva"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "model_creator": {
+            "handlers": ["model_creator"],
+            "level": "INFO",
+            "propagate": True,
+        },
     },
 }

@@ -35,7 +35,9 @@ class Command(BaseCommand):
             f"Found {len(hires)} hire activities from {options['start_date']} to {options['end_date']}.",
         )
         for hire in hires:
-            candidate = biclient.get("Candidate Detail", parameters=hire["CANDIDATEID"])[0]
+            candidate = biclient.get(
+                "Candidate Detail", parameters=hire["CANDIDATEID"]
+            )[0]
             tsheets_user = TSheetsUser.objects.filter(email=candidate["EMAIL"]).first()
             if tsheets_user:
                 logger.log(logging.INFO, "Found a tsheets user in jobdiva.")
@@ -43,7 +45,9 @@ class Command(BaseCommand):
                     Candidate, {**candidate, "tsheets_user": tsheets_user}, id="ID"
                 )
 
-                company = biclient.get("Company Detail", parameters=hire["COMPANYID"])[0]
+                company = biclient.get("Company Detail", parameters=hire["COMPANYID"])[
+                    0
+                ]
                 create_model_from_dict(Company, company, id="ID")
 
                 job = biclient.get("Job Detail", parameters=hire["JOBID"])[0]

@@ -6,11 +6,9 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Timesheets', '0002_add_zones'),
+        ("Timesheets", "0002_add_zones"),
     ]
 
     operations = [
-        migrations.DeleteModel(
-            name='TSheetsCompany',
-        ),
+        migrations.DeleteModel(name="TSheetsCompany",),
     ]

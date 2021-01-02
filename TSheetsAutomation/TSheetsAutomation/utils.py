@@ -34,7 +34,8 @@ def create_model_from_dict(model, fields, id="id"):
         }
         foreign_fields = dict(
             filter(
-                lambda elem: elem[0] not in (id_postfix, id) and elem[0].endswith(id_postfix),
+                lambda elem: elem[0] not in (id_postfix, id)
+                and elem[0].endswith(id_postfix),
                 fields.items(),
             )
         )

@@ -9,70 +9,151 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('Timesheets', '0001_initial'),
+        ("Timesheets", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Candidate',
+            name="Candidate",
             fields=[
-                ('ID', models.CharField(max_length=64, primary_key=True, serialize=False)),
-                ('FIRSTNAME', models.CharField(max_length=255)),
-                ('LASTNAME', models.CharField(max_length=255)),
-                ('EMAIL', models.EmailField(max_length=254)),
-                ('tsheets_user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='Timesheets.TSheetsUser')),
+                (
+                    "ID",
+                    models.CharField(max_length=64, primary_key=True, serialize=False),
+                ),
+                ("FIRSTNAME", models.CharField(max_length=255)),
+                ("LASTNAME", models.CharField(max_length=255)),
+                ("EMAIL", models.EmailField(max_length=254)),
+                (
+                    "tsheets_user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="Timesheets.TSheetsUser",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Company',
+            name="Company",
             fields=[
-                ('ID', models.CharField(max_length=64, primary_key=True, serialize=False)),
-                ('COMPANYNAME', models.CharField(max_length=255)),
+                (
+                    "ID",
+                    models.CharField(max_length=64, primary_key=True, serialize=False),
+                ),
+                ("COMPANYNAME", models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
-            name='Job',
+            name="Job",
             fields=[
-                ('ID', models.CharField(max_length=64, primary_key=True, serialize=False)),
-                ('JOBDIVANO', models.CharField(max_length=64)),
-                ('COMPANY', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='jobdiva.Company')),
+                (
+                    "ID",
+                    models.CharField(max_length=64, primary_key=True, serialize=False),
+                ),
+                ("JOBDIVANO", models.CharField(max_length=64)),
+                (
+                    "COMPANY",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="jobdiva.Company",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ParentCompany',
+            name="ParentCompany",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
             ],
         ),
         migrations.CreateModel(
-            name='Submittal',
+            name="Submittal",
             fields=[
-                ('ID', models.CharField(max_length=64, primary_key=True, serialize=False)),
-                ('CANDIDATE', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='jobdiva.Candidate')),
-                ('JOB', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='jobdiva.Job')),
+                (
+                    "ID",
+                    models.CharField(max_length=64, primary_key=True, serialize=False),
+                ),
+                (
+                    "CANDIDATE",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="jobdiva.Candidate",
+                    ),
+                ),
+                (
+                    "JOB",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.PROTECT, to="jobdiva.Job"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Placement',
+            name="Placement",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('submittal', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='jobdiva.Submittal')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "submittal",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="jobdiva.Submittal",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Hire',
+            name="Hire",
             fields=[
-                ('ACTIVITYID', models.CharField(max_length=64, primary_key=True, serialize=False)),
-                ('ACTIVITYDATE', models.DateTimeField()),
-                ('CANDIDATE', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='jobdiva.Candidate')),
-                ('COMPANY', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='jobdiva.Company')),
-                ('JOB', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='jobdiva.Job')),
+                (
+                    "ACTIVITYID",
+                    models.CharField(max_length=64, primary_key=True, serialize=False),
+                ),
+                ("ACTIVITYDATE", models.DateTimeField()),
+                (
+                    "CANDIDATE",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="jobdiva.Candidate",
+                    ),
+                ),
+                (
+                    "COMPANY",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="jobdiva.Company",
+                    ),
+                ),
+                (
+                    "JOB",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="jobdiva.Job"
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='company',
-            name='parent_company',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='jobdiva.ParentCompany'),
+            model_name="company",
+            name="parent_company",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="jobdiva.ParentCompany",
+            ),
         ),
     ]

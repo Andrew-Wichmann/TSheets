@@ -3,7 +3,12 @@ from django.urls import reverse, path
 from django.utils.html import mark_safe, format_html
 from django.http.response import JsonResponse
 from django.shortcuts import redirect
-from Timesheets.models import TSheetsUser, ManualTimesheet, RegularTimesheet, TimesheetEntry
+from Timesheets.models import (
+    TSheetsUser,
+    ManualTimesheet,
+    RegularTimesheet,
+    TimesheetEntry,
+)
 
 # Register your models here.
 
@@ -37,7 +42,13 @@ class TSheetsUserAdmin(admin.ModelAdmin):
 
 class TimesheetAdmin(admin.ModelAdmin):
     list_filter = ("espo_processed", "user__last_name")
-    list_display = ("id", "user_display", "hours_display", "espo_processed", "timesheet_group")
+    list_display = (
+        "id",
+        "user_display",
+        "hours_display",
+        "espo_processed",
+        "timesheet_group",
+    )
 
     def hours_display(self, obj):
         return round(obj.hours, 2)
@@ -88,7 +99,8 @@ class TimesheetEntry(admin.ModelAdmin):
         return mark_safe(
             "<a href={}>{} {}</a>".format(
                 reverse(
-                    f"admin:{user._meta.app_label}_{user._meta.model_name}_change", args=(user.pk,)
+                    f"admin:{user._meta.app_label}_{user._meta.model_name}_change",
+                    args=(user.pk,),
                 ),
                 user.first_name,
                 user.last_name,
@@ -120,5 +132,8 @@ class TimesheetEntry(admin.ModelAdmin):
             return redirect("/admin/Timesheets/timesheetentry")
         else:
             JsonResponse(
-                {"timesheet_entry_id": timesheet_entry.id, "message": "Error processing timesheet"}
+                {
+                    "timesheet_entry_id": timesheet_entry.id,
+                    "message": "Error processing timesheet",
+                }
             )

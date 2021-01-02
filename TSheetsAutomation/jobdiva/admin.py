@@ -29,7 +29,10 @@ class CandidateAdmin(admin.ModelAdmin):
     def tsheets_user_display(self, obj):
         user = obj.tsheets_user
         display_text = "<a href={}>{}</a>".format(
-            reverse(f"admin:{user._meta.app_label}_{user._meta.model_name}_change", args=(user.pk,))
+            reverse(
+                f"admin:{user._meta.app_label}_{user._meta.model_name}_change",
+                args=(user.pk,),
+            )
         )
 
         if display_text:

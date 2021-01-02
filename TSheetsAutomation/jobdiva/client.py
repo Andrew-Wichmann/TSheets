@@ -12,16 +12,22 @@ DATETIME_STRING_FMT = "%Y-%m-%d"
 one_sunday_ago = relativedelta.relativedelta(weekday=relativedelta.SU(-5))
 last_sunday_string = (datetime.now() + one_sunday_ago).strftime(DATETIME_STRING_FMT)
 two_mondays_ago = relativedelta.relativedelta(weekday=relativedelta.MO(-6))
-two_mondays_ago_string = (datetime.now() - two_mondays_ago).strftime(DATETIME_STRING_FMT)
+two_mondays_ago_string = (datetime.now() - two_mondays_ago).strftime(
+    DATETIME_STRING_FMT
+)
 
 RETRY_ATTEMPTS = 2
 
 
 class BaseJobDivaClient:
     def __init__(self, service):
-        self.username, self.password = get_credentials("jobdiva_username_and_password.txt")
+        self.username, self.password = get_credentials(
+            "jobdiva_username_and_password.txt"
+        )
         self.logger = logging.getLogger(f"JobDivaClient - {service}")
-        self._client = Client(f"https://ws.jobdiva.com/axis2-1.6.1/services/{service}?wsdl")
+        self._client = Client(
+            f"https://ws.jobdiva.com/axis2-1.6.1/services/{service}?wsdl"
+        )
 
         for method_name in dir(self._client.service):
             if not method_name.startswith("__"):
@@ -33,14 +39,14 @@ class BaseJobDivaClient:
         def add_creds(*args, **kwargs):
             if service == "JobDivaAPI":
                 _kwargs = {
-                    "clientid": 665, # TODO: hide this
+                    "clientid": 665,  # TODO: hide this
                     "username": self.username,
                     "password": self.password,
                     **kwargs,
                 }
             elif service == "BIData":
                 _kwargs = {
-                    "ClientID": 665, # TODO: hide this
+                    "ClientID": 665,  # TODO: hide this
                     "Username": self.username,
                     "Password": self.password,
                     **kwargs,
@@ -50,8 +56,13 @@ class BaseJobDivaClient:
             for _ in range(0, RETRY_ATTEMPTS):
                 if service == "BIData":
                     if not ret.Data:
-                        if "There are too many API requests in the queue." in ret.Message:
-                            self.logger.warning("Too many api requests. Sleeping for 4 minutes.")
+                        if (
+                            "There are too many API requests in the queue."
+                            in ret.Message
+                        ):
+                            self.logger.warning(
+                                "Too many api requests. Sleeping for 4 minutes."
+                            )
                             sleep(60 * 4)
                             ret = api(**_kwargs)
                         else:
@@ -68,7 +79,9 @@ class BaseJobDivaClient:
 
 
 def cast_ids_to_ints(fields):
-    return {field: int(value) if "ID" in field else value for field, value in fields.items()}
+    return {
+        field: int(value) if "ID" in field else value for field, value in fields.items()
+    }
 
 
 class JobDivaAPIClient(BaseJobDivaClient):
@@ -109,7 +122,10 @@ class BIDataClient(BaseJobDivaClient):
         parameters=None,
     ):
         ret = self.getBIData(
-            MetricName=metric, FromDate=from_string, ToDate=to_string, Parameters=parameters
+            MetricName=metric,
+            FromDate=from_string,
+            ToDate=to_string,
+            Parameters=parameters,
         )
         return ret
 

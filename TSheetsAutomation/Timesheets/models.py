@@ -28,7 +28,9 @@ class TSheetsUser(models.Model):
     approved_to = models.DateField()
     require_password_change = models.BooleanField()
     pay_rate = models.FloatField()
-    pay_interval = models.CharField(max_length=256, choices=[("hour", "hour"), ("year", "year")])
+    pay_interval = models.CharField(
+        max_length=256, choices=[("hour", "hour"), ("year", "year")]
+    )
 
 
 class JobCode(models.Model):
@@ -65,8 +67,13 @@ class TimesheetEntry(models.Model):
 
         logger = logging.getLogger("management")
         timesheet_entries = []
-        for date in [(self.weekendingdate - relativedelta(days=day)).date() for day in range(0, 7)]:
-            timesheets = list(filter(lambda timesheet: timesheet.date == date, self.timesheets))
+        for date in [
+            (self.weekendingdate - relativedelta(days=day)).date()
+            for day in range(0, 7)
+        ]:
+            timesheets = list(
+                filter(lambda timesheet: timesheet.date == date, self.timesheets)
+            )
             hours = sum([timesheet.hours for timesheet in timesheets])
 
             timesheet_entries.append({"date": f"{date}T00:00:00", "hours": hours})
@@ -99,7 +106,9 @@ class TimesheetEntry(models.Model):
 
     @property
     def timesheets(self):
-        return list(self.manualtimesheet_set.all()) + list(self.regulartimesheet_set.all())
+        return list(self.manualtimesheet_set.all()) + list(
+            self.regulartimesheet_set.all()
+        )
 
     @property
     def processed(self):
@@ -110,7 +119,9 @@ class TimesheetEntry(models.Model):
 
 
 class ManualTimesheet(models.Model):
-    user = models.ForeignKey(TSheetsUser, related_name="manual_timesheet", on_delete=models.PROTECT)
+    user = models.ForeignKey(
+        TSheetsUser, related_name="manual_timesheet", on_delete=models.PROTECT
+    )
     jobcode = models.ForeignKey(JobCode, null=True, on_delete=models.PROTECT)
     date = models.DateField()
     duration = models.IntegerField()
@@ -123,7 +134,9 @@ class ManualTimesheet(models.Model):
     last_modified = models.DateTimeField()
 
     espo_processed = models.BooleanField(default=False)
-    timesheet_entry = models.ForeignKey(TimesheetEntry, on_delete=models.PROTECT, null=True)
+    timesheet_entry = models.ForeignKey(
+        TimesheetEntry, on_delete=models.PROTECT, null=True
+    )
 
     @property
     def hours(self):
@@ -154,7 +167,9 @@ class RegularTimesheet(models.Model):
     origin_hint = models.CharField(max_length=256, null=True)
 
     espo_processed = models.BooleanField(default=False)
-    timesheet_entry = models.ForeignKey(TimesheetEntry, on_delete=models.PROTECT, null=True)
+    timesheet_entry = models.ForeignKey(
+        TimesheetEntry, on_delete=models.PROTECT, null=True
+    )
 
     @property
     def hours(self):

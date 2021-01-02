@@ -6,15 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('jobdiva', '0001_initial'),
+        ("jobdiva", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ProcessTimesheetsRun',
+            name="ProcessTimesheetsRun",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('run_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("run_at", models.DateTimeField(auto_now=True)),
             ],
         ),
     ]

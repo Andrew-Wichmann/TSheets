@@ -9,7 +9,9 @@ class ParentCompany(models.Model):
 class Company(models.Model):
     ID = models.CharField(primary_key=True, max_length=64)
     COMPANYNAME = models.CharField(max_length=255)
-    parent_company = models.ForeignKey(ParentCompany, on_delete=models.PROTECT, null=True)
+    parent_company = models.ForeignKey(
+        ParentCompany, on_delete=models.PROTECT, null=True
+    )
 
 
 class Candidate(models.Model):
