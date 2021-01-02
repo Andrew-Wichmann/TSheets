@@ -33,14 +33,14 @@ class BaseJobDivaClient:
         def add_creds(*args, **kwargs):
             if service == "JobDivaAPI":
                 _kwargs = {
-                    "clientid": 665,
+                    "clientid": 665, # TODO: hide this
                     "username": self.username,
                     "password": self.password,
                     **kwargs,
                 }
             elif service == "BIData":
                 _kwargs = {
-                    "ClientID": 665,
+                    "ClientID": 665, # TODO: hide this
                     "Username": self.username,
                     "Password": self.password,
                     **kwargs,
@@ -87,6 +87,7 @@ class BIDataClient(BaseJobDivaClient):
         to_string=last_sunday_string,
         parameters=None,
     ):
+        # TODO: figure out if there is a limit to how many rows can be returned
         data = self.get_raw_data(metric, from_string, to_string, parameters)
         if data.Data:
             row_data = data.Data.Row
@@ -130,7 +131,7 @@ class BIDataClient(BaseJobDivaClient):
 """
 >>> myc.myClient.service.getBIData(
 ... MetricName='Employee Billing Records Detail',
-...             ClientID=665,
+...             ClientID=665, # TODO: hide this
 ...             Username=<username>,
 ...             Password=<password>,
 ...             FromDate=from_string,
@@ -185,4 +186,4 @@ weekendingdate="2019-11-10T00:00:00"
 
 """
 
-# api(ClientID=665, Username=self.username, Password=self.password, **kwargs)
+# api(ClientID=665, # TODO: hide this Username=self.username, Password=self.password, **kwargs)
