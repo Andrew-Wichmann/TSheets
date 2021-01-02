@@ -37,7 +37,7 @@ class Command(BaseCommand):
             )[0]
             tsheets_user = TSheetsUser.objects.filter(email=candidate["EMAIL"]).first()
             if tsheets_user:
-                logger.log(logging.INFO, f"Found tsheets user {candidate["EMAIL"]} in jobdiva.")
+                logger.log(logging.INFO, f"Found tsheets user {candidate['EMAIL']} in jobdiva.")
                 create_model_from_dict(
                     Candidate, {**candidate, "tsheets_user": tsheets_user}, id="ID"
                 )
