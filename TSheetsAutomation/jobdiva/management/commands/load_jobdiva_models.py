@@ -26,21 +26,18 @@ class Command(BaseCommand):
             from_string=options["start_date"],
             to_string=options["end_date"],
         )
-        hires = []
-        for activity in activities:
-            if activity["HIREFLAG"] == "1":
-                hires.append(activity)
+        activities = list(filter(lambda x: x["HIREFLAG"] == "1", activities))
         logger.log(
             logging.INFO,
-            f"Found {len(hires)} hire activities from {options['start_date']} to {options['end_date']}.",
+            f"Found {len(activities)} hire activities from {options['start_date']} to {options['end_date']}.",
         )
-        for hire in hires:
+        for hire in activities:
             candidate = biclient.get(
                 "Candidate Detail", parameters=hire["CANDIDATEID"]
             )[0]
             tsheets_user = TSheetsUser.objects.filter(email=candidate["EMAIL"]).first()
             if tsheets_user:
-                logger.log(logging.INFO, "Found a tsheets user in jobdiva.")
+                logger.log(logging.INFO, f"Found tsheets user {candidate["EMAIL"]} in jobdiva.")
                 create_model_from_dict(
                     Candidate, {**candidate, "tsheets_user": tsheets_user}, id="ID"
                 )
@@ -53,4 +50,6 @@ class Command(BaseCommand):
                 job = biclient.get("Job Detail", parameters=hire["JOBID"])[0]
                 create_model_from_dict(Job, job, id="ID")
                 create_model_from_dict(Hire, hire, id="ACTIVITYID")
+            else:
+                logger.warning(f"Did not find jobdiva candidate {candidate["EMAIL"]} in our tsheets DB.")
             time.sleep(2)
