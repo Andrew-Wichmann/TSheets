@@ -8,7 +8,16 @@ from django.utils.html import mark_safe
 
 @admin.register(Hire)
 class HireAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["ACTIVITYID", "first_name", "last_name", "email"]
+
+    def first_name(self, obj):
+        return obj.CANDIDATE.FIRSTNAME
+
+    def last_name(self, obj):
+        return obj.CANDIDATE.LASTNAME
+
+    def email(self, obj):
+        return obj.CANDIDATE.EMAIL
 
 
 @admin.register(Company)
