@@ -14,6 +14,7 @@ from Timesheets.models import (
 )
 from django.conf import settings
 from TSheetsAutomation.utils import create_model_from_dict
+from jobdiva.models import Candidate
 
 
 class Command(BaseCommand):
@@ -22,6 +23,7 @@ class Command(BaseCommand):
         parser.add_argument("--end_date", type=str)
 
     def handle(self, *args, **options):
+        logger = logging.getLogger("management")
         url = "https://rest.tsheets.com/api/v1/timesheets"
 
         querystring = {
@@ -50,7 +52,17 @@ class Command(BaseCommand):
                     response.raise_for_status()
             response = response.json()
             for user in response["supplemental_data"].get("users", {}).values():
-                create_model_from_dict(TSheetsUser, user)
+                tsheets_user = create_model_from_dict(TSheetsUser, user)
+                jobdiva_user, created = Candidate.objects.get_or_create(
+                    email=user["email"]
+                )
+                if created:
+                    logger.error(f'Jobdiva Candidate {user["email"]} not found')
+                    # TODO: alert Sentry
+                    continue
+                else:
+                    jobdiva_user.tsheets_user = tsheets_user
+                    jobdiva_user.save()
 
             for jobcode in response["supplemental_data"].get("jobcodes", {}).values():
                 create_model_from_dict(JobCode, jobcode)

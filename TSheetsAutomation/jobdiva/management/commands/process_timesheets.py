@@ -11,6 +11,7 @@ from jobdiva.models import ProcessTimesheetsRun
 class Command(BaseCommand):
     def handle(self, *args, **options):
         logger = logging.getLogger("management")
+        logger.info("Start processing timesheets")
 
         start_date = (
             ProcessTimesheetsRun.objects.order_by("run_at")
@@ -28,11 +29,19 @@ class Command(BaseCommand):
             "load_jobdiva_models", start_date=start_date, end_date=end_date
         )
 
+        # NOTE: We can't use TimesheetEntry.objects.filter() here because .processed is a property of the TimesheetEntry class.
+        # Ie. it's NOT a column that can be filtered on. Maybe the better way to do that would
+        # be to put a .post_save hook on the Timesheet models and set the parent TimesheetEntry
+        # field if all Timesheets are processed.
         for timesheet_entry in filter(
             lambda entry: not entry.processed, TimesheetEntry.objects.all()
         ):
             logger.info(
                 f"Processing timesheets for {timesheet_entry.user.email} for the weekendingdate of {timesheet_entry.weekendingdate}"
             )
-            timesheet_entry.process()
+            processed = timesheet_entry.process()
+            if not processed:
+                # TODO: alert Sentry
+                pass
         ProcessTimesheetsRun().save()
+        logger.info("Finished processing timesheets")

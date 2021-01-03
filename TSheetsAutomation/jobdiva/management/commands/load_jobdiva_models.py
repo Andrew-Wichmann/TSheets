@@ -37,7 +37,9 @@ class Command(BaseCommand):
             )[0]
             tsheets_user = TSheetsUser.objects.filter(email=candidate["EMAIL"]).first()
             if tsheets_user:
-                logger.log(logging.INFO, f"Found tsheets user {candidate['EMAIL']} in jobdiva.")
+                logger.log(
+                    logging.INFO, f"Found tsheets user {candidate['EMAIL']} in jobdiva."
+                )
                 create_model_from_dict(
                     Candidate, {**candidate, "tsheets_user": tsheets_user}, id="ID"
                 )
@@ -50,6 +52,4 @@ class Command(BaseCommand):
                 job = biclient.get("Job Detail", parameters=hire["JOBID"])[0]
                 create_model_from_dict(Job, job, id="ID")
                 create_model_from_dict(Hire, hire, id="ACTIVITYID")
-            else:
-                logger.warning(f"Did not find jobdiva candidate {candidate['EMAIL']} in our tsheets DB.")
             time.sleep(2)
