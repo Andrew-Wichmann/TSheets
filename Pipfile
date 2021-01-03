@@ -11,6 +11,7 @@ django = "*"
 requests = "*"
 python-dateutil = "*"
 zeep = "*"
+sentry-sdk = "*"
 
 [requires]
 python_version = "3.6"
