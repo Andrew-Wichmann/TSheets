@@ -68,7 +68,9 @@ class Command(BaseCommand):
             for jobcode in response["supplemental_data"].get("jobcodes", {}).values():
                 create_model_from_dict(JobCode, jobcode)
 
-            for timesheet in response["results"]["timesheets"].values():
+            timesheets = response["results"]["timesheets"].values()
+            logger.info(f"Found {len(timesheets)} timesheets")
+            for timesheet in timesheets:
                 _type = timesheet.pop("type")
                 if _type == "regular":
                     model_obj = create_model_from_dict(RegularTimesheet, timesheet)
