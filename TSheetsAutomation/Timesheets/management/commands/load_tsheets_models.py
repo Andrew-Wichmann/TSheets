@@ -5,7 +5,10 @@ from datetime import datetime
 from dateutil import relativedelta
 from time import sleep
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
+import sentry_sdk
+
 from Timesheets.models import (
     ManualTimesheet,
     RegularTimesheet,
@@ -13,7 +16,6 @@ from Timesheets.models import (
     JobCode,
     TimesheetEntry,
 )
-from django.conf import settings
 from TSheetsAutomation.utils import create_model_from_dict
 from jobdiva.models import Candidate
 
@@ -58,8 +60,12 @@ class Command(BaseCommand):
                     email=user["email"]
                 )
                 if created:
-                    logger.error(f'Jobdiva Candidate {user["email"]} not found')
-                    # TODO: alert Sentry
+                    logger.error(
+                        f'Jobdiva Candidate {user["email"]} not found while loading tsheets models'
+                    )
+                    sentry_sdk.capture_message(
+                        f'Jobdiva Candidate {user["email"]} not found while loading tsheets models'
+                    )
                     continue
                 else:
                     jobdiva_user.tsheets_user = tsheets_user

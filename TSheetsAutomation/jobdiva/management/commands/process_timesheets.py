@@ -1,6 +1,7 @@
 import logging
 from datetime import datetime
 
+import sentry_sdk
 from django.core.management.base import BaseCommand
 from django.core import management
 
@@ -41,7 +42,9 @@ class Command(BaseCommand):
             )
             processed = timesheet_entry.process()
             if not processed:
-                # TODO: alert Sentry
-                pass
+                sentry_sdk.capture_message(
+                    f"Timesheet for {timesheet_entry.user.email} for the weekendingdate of {timesheet_entry.weekendingdate} not processed."
+                )
+
         ProcessTimesheetsRun().save()
         logger.info("Finished processing timesheets")
