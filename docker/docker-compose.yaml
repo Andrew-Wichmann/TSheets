@@ -1,0 +1,25 @@
+version: '3.4'
+services:
+    tsheets:
+        image: "tsheets-service:latest"
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile
+        volumes:
+            - ..:/app
+            - ./start.sh:/app/start.sh
+        environment:
+            DATABASE_URL: postgresql://tsheets:tsheets@tsheets-db:5432/tsheets
+        env_file:
+            - ./.env
+        depends_on:
+            - tsheets-db
+
+    tsheets-db:
+        image: postgres:9.6-alpine
+        environment:
+            POSTGRES_USER: tsheets
+            POSTGRES_PASSWORD: tsheets
+            POSTGRES_DB: tsheets
+        ports:
+            - "5432"

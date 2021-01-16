@@ -3,3 +3,5 @@ creds
 *.pyc
 *.sqlite3
 *.log
+.env
+.venv

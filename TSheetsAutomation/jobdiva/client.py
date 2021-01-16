@@ -1,11 +1,11 @@
 import logging
+import os
 from datetime import datetime
 from dateutil import relativedelta
 from functools import wraps
 from time import sleep
 
 from zeep import Client
-from utils import get_credentials
 
 DATETIME_STRING_FMT = "%Y-%m-%d"
 
@@ -21,9 +21,8 @@ RETRY_ATTEMPTS = 2
 
 class BaseJobDivaClient:
     def __init__(self, service):
-        self.username, self.password = get_credentials(
-            "jobdiva_username_and_password.txt"
-        )
+        self.username = os.environ["JOBDIVA_USERNAME"]
+        self.password = os.environ["JOBDIVA_PASSWORD"]
         self.logger = logging.getLogger(f"JobDivaClient - {service}")
         self._client = Client(
             f"https://ws.jobdiva.com/axis2-1.6.1/services/{service}?wsdl"

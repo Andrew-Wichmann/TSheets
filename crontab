@@ -1,1 +1,1 @@
-23 0 * * SUN cd /home/developer/TSheets/TSheetsAutomation && /usr/local/bin/pipenv run python manage.py process_timesheets
+23 0 * * SUN /usr/local/bin/python /app/TSheetsAutomation/manage.py process_timesheets > /proc/1/fd/1 2>/proc/1/fd/2

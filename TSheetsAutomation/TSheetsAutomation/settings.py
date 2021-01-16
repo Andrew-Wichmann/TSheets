@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import sys
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -127,57 +128,27 @@ LOGGING = {
         "verbose": {"format": "{levelname} {asctime} - {message}", "style": "{"}
     },
     "handlers": {
-        "django": {
+        "stdout": {
             "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
-            "maxBytes": 1024 * 1024 * 10,
-            "backupCount": 10,
+            "class": "logging.StreamHandler",
             "formatter": "verbose",
-            "filename": os.path.join(BASE_DIR, "logs", "django.log"),
-        },
-        "management": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
-            "maxBytes": 1024 * 1024 * 10,
-            "backupCount": 10,
-            "formatter": "verbose",
-            "filename": os.path.join(BASE_DIR, "logs", "management.log"),
-        },
-        "jobdiva": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
-            "maxBytes": 1024 * 1024 * 10,
-            "backupCount": 10,
-            "formatter": "verbose",
-            "filename": os.path.join(BASE_DIR, "logs", "jobdiva.log"),
-        },
-        "model_creator": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
-            "maxBytes": 1024 * 1024 * 10,
-            "backupCount": 10,
-            "formatter": "verbose",
-            "filename": os.path.join(BASE_DIR, "logs", "model_creator.log"),
+            "stream": sys.stdout,
         },
     },
     "loggers": {
-        "django": {"handlers": ["django"], "level": "INFO", "propagate": True},
-        "management": {"handlers": ["management"], "level": "INFO", "propagate": True},
+        "django": {"handlers": ["stdout"], "level": "INFO", "propagate": True},
+        "management": {"handlers": ["stdout"], "level": "INFO", "propagate": True},
         "JobDivaClient - BIData": {
-            "handlers": ["jobdiva"],
+            "handlers": ["stdout"],
             "level": "INFO",
             "propagate": True,
         },
         "JobDivaClient - JobdivaAPI": {
-            "handlers": ["jobdiva"],
+            "handlers": ["stdout"],
             "level": "INFO",
             "propagate": True,
         },
-        "model_creator": {
-            "handlers": ["model_creator"],
-            "level": "INFO",
-            "propagate": True,
-        },
+        "model_creator": {"handlers": ["stdout"], "level": "INFO", "propagate": True},
     },
 }
 

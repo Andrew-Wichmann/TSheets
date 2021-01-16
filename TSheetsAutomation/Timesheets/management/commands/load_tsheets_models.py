@@ -38,10 +38,7 @@ class Command(BaseCommand):
         }
 
         def get_token():
-            with open(
-                os.path.join(settings.CREDENTIALS_FOLDER, "tsheets_token"), "r"
-            ) as fd:
-                return fd.readline().split("\n")[0]
+            return os.environ["TSHEETS_TOKEN"]
 
         headers = {"Authorization": f"Bearer {get_token()}"}
 
@@ -54,7 +51,7 @@ class Command(BaseCommand):
                 else:
                     response.raise_for_status()
             response = response.json()
-            for user in response["supplemental_data"].get("users", {}).values():
+            for user in response.get("supplemental_data", {}).get("users", {}).values():
                 tsheets_user = create_model_from_dict(TSheetsUser, user)
                 jobdiva_user = Candidate.objects.filter(
                     email=user["email"].lower()
