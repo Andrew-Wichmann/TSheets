@@ -56,10 +56,10 @@ class Command(BaseCommand):
             response = response.json()
             for user in response["supplemental_data"].get("users", {}).values():
                 tsheets_user = create_model_from_dict(TSheetsUser, user)
-                jobdiva_user, created = Candidate.objects.get_or_create(
-                    email=user["email"]
-                )
-                if created:
+                jobdiva_user = Candidate.objects.filter(
+                    email=user["email"].lower()
+                ).first()
+                if jobdiva_user:
                     logger.error(
                         f'Jobdiva Candidate {user["email"]} not found while loading tsheets models'
                     )

@@ -35,10 +35,12 @@ class Command(BaseCommand):
             candidate = biclient.get(
                 "Candidate Detail", parameters=hire["CANDIDATEID"]
             )[0]
-            tsheets_user = TSheetsUser.objects.filter(email=candidate["EMAIL"]).first()
+            tsheets_user = TSheetsUser.objects.filter(
+                email=candidate["EMAIL"].lower()
+            ).first()
             if tsheets_user:
                 logger.log(
-                    logging.INFO, f"Found tsheets user {candidate['EMAIL']} in jobdiva."
+                    logging.INFO, f"Found tsheets user {candidate['EMAIL'].lower()} in jobdiva."
                 )
                 create_model_from_dict(
                     Candidate, {**candidate, "tsheets_user": tsheets_user}, id="ID"
