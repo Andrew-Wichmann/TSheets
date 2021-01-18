@@ -54,7 +54,7 @@ class Command(BaseCommand):
             for user in response.get("supplemental_data", {}).get("users", {}).values():
                 tsheets_user = create_model_from_dict(TSheetsUser, user)
                 jobdiva_user = Candidate.objects.filter(
-                    email=user["email"].lower()
+                    EMAIL=user["email"].lower()
                 ).first()
                 if jobdiva_user:
                     logger.error(
