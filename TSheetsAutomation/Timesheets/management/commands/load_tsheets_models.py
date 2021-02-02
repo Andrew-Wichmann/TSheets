@@ -56,7 +56,7 @@ class Command(BaseCommand):
                 jobdiva_user = Candidate.objects.filter(
                     EMAIL=user["email"].lower()
                 ).first()
-                if jobdiva_user:
+                if not jobdiva_user:
                     logger.error(
                         f'Jobdiva Candidate {user["email"]} not found while loading tsheets models'
                     )
