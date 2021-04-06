@@ -1,21 +1,23 @@
+-i https://pypi.org/simple/
 appdirs==1.4.4
-asgiref==3.3.1
+asgiref==3.3.3
 attrs==20.3.0
 cached-property==1.5.2
 certifi==2020.12.5
 chardet==4.0.0
-defusedxml==0.6.0
-Django==3.1.4
+defusedxml==0.7.1
+django==3.1.4
 idna==2.10
 isodate==0.6.0
-lxml==4.6.2
+lxml==4.6.3
 python-dateutil==2.8.1
-pytz==2020.5
-requests==2.25.1
+pytz==2021.1
 requests-file==1.5.1
 requests-toolbelt==0.9.1
+requests==2.25.1
 sentry-sdk==0.19.5
 six==1.15.0
 sqlparse==0.4.1
-urllib3==1.26.2
+typing-extensions==3.7.4.3 ; python_version < '3.8'
+urllib3==1.26.4
 zeep==4.0.0
